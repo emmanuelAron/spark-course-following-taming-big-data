@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import StructType, StructField,IntegerType,DoubleType
 
-spark = SparkSession.builder.appName("SparkSQL").getOrCreate()
+spark = SparkSession.builder.appName("TotalSpentByCustomer").master("local[*]").getOrCreate()
 
 #Schema 
 schema = StructType(
@@ -19,10 +19,11 @@ print("Here is our inferred schema:")
 people.printSchema()
 
 print("Group by cust_id, and sum by amount,rounded with 2 decimals")
-people.groupBy("cust_id").agg(F.round(F.sum("amount"),2).alias("total_spent")).show()
+totalCustomer = people.groupBy("cust_id").agg(F.round(F.sum("amount"),2).alias("total_spent"))
+totalCustomerSorted = totalCustomer.sort("total_spent")
 
-#print("Make everyone 10 years older:")
-#people.select(people.name, people.age + 10).show()
+totalCustomerSorted.show(totalCustomerSorted.count())
+
 
 spark.stop()
 
